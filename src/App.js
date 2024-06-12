@@ -1,5 +1,11 @@
+import WeatherApp from "./WeatherApp";
+
 function App() {
-  return <div className="App">Weather</div>;
+  return (
+    <div className="App">
+      <WeatherApp />
+    </div>
+  );
 }
 
 export default App;
