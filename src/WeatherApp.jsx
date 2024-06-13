@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
-import { WiDaySunny, WiCloudy, WiRain } from "react-icons/wi";
+import { useState } from "react";
 import "./styles.css";
+import WeatherStatus from "./components/WeatherStatus";
+import WeatherInfo from "./components/WeatherInfo";
+import WeatherInput from "./components/WeatherInput";
 
 function WeatherApp() {
   // State to store the weather data
@@ -11,27 +13,9 @@ function WeatherApp() {
   const [loading, setLoading] = useState(false);
   // State to handle error messages
   const [error, setError] = useState(null);
-  // State to store the current date and time
-  const [date, setDate] = useState(new Date());
   // API Key for OpenWeatherMap API
   const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
-  // console.log("API KEY API KEY", apiKey);
-
-  // useEffect to update the current date and time every second
-  useEffect(() => {
-    // Set an interval to update the currentDate state every second
-    const interval = setInterval(() => {
-      setDate(new Date());
-    }, 1000);
-
-    // Cleanup interval on component unmount to prevent memory leaks
-    return () => clearInterval(interval);
-  }, []);
-
-  // Function to update the city state
-  function addCity(params) {
-    setCity(params);
-  }
+  // console.log("API KEY : ", apiKey);
 
   // Function to fetch weather data from the API
   const fetchWeather = async () => {
@@ -70,59 +54,13 @@ function WeatherApp() {
     }
   };
 
-  // Function to get the appropriate weather icon based on the climate
-  const getWeatherIcon = (description) => {
-    switch (description) {
-      case "clear sky":
-        return <WiDaySunny size={50} />;
-      case description.match(/cloud/)?.input:
-        return <WiCloudy size={50} />;
-      case description.match(/rain/)?.input:
-        return <WiRain size={50} />;
-      default:
-        return <WiDaySunny size={50} />;
-    }
-  };
-
   return (
     <div className="weather-app">
       <h1>Weather App</h1>
-      <div className="input-container">
-        <input
-          type="text"
-          name="city"
-          id="city"
-          value={city}
-          onChange={(e) => addCity(e.target.value)}
-        />
-        <button type="button" onClick={fetchWeather}>
-          Go
-        </button>
-      </div>
+      <WeatherInput city={city} setCity={setCity} fetchWeather={fetchWeather} />
 
-      <div className="status">
-        {loading && <p>Loading...</p>}
-        {error && <p className="error">{error}</p>}
-      </div>
-      {weather && !loading && !error && (
-        <div className="weather-info">
-          <div className="icon-temp">
-            <h2>{weather.name}</h2>
-            {getWeatherIcon(weather.weather[0].description)}
-          </div>
-          <p className="temp">{weather.main.temp}°C</p>
-          <p className="description">{weather.weather[0].description}</p>
-          <div className="datetime">
-            <p>
-              {date.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-            <p>{date.toDateString()}</p>
-          </div>
-        </div>
-      )}
+      <WeatherStatus loading={loading} error={error} />
+      {weather && !loading && !error && <WeatherInfo weather={weather} />}
     </div>
   );
 }
